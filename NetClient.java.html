@@ -1,0 +1,102 @@
+<html>
+<head>
+<title>NetClient.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cc7832;}
+.s1 { color: #a9b7c6;}
+.s2 { color: #6a8759;}
+.s3 { color: #6897bb;}
+</style>
+</head>
+<body bgcolor="#2b2b2b">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+NetClient.java</font>
+</center></td></tr></table>
+<pre><span class="s0">package </span><span class="s1">com.company</span><span class="s0">;</span>
+
+<span class="s0">import </span><span class="s1">javax.swing.*</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">java.awt.*</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">java.awt.event.KeyEvent</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">java.awt.event.KeyListener</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">java.io.IOException</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">java.io.InputStreamReader</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">java.io.PrintWriter</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">java.net.Socket</span><span class="s0">;</span>
+
+
+
+<span class="s0">public class </span><span class="s1">NetClient </span><span class="s0">extends </span><span class="s1">JFrame </span><span class="s0">implements </span><span class="s1">KeyListener {</span>
+    <span class="s0">final </span><span class="s1">String serverIP = </span><span class="s2">&quot;127.0.0.1&quot;</span><span class="s0">;</span>
+    <span class="s0">final int </span><span class="s1">serverPort = </span><span class="s3">1234</span><span class="s0">;</span>
+
+    <span class="s1">JTextArea textArea</span><span class="s0">;</span>
+    <span class="s1">JScrollPane scrollPane</span><span class="s0">;</span>
+    <span class="s1">InputStreamReader in</span><span class="s0">;</span>
+    <span class="s1">PrintWriter out</span><span class="s0">;</span>
+
+    <span class="s1">NetClient() {</span>
+        <span class="s0">super</span><span class="s1">(</span><span class="s2">&quot;Simple Chat client&quot;</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">setSize(</span><span class="s3">400</span><span class="s0">, </span><span class="s3">500</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">setDefaultCloseOperation(EXIT_ON_CLOSE)</span><span class="s0">;</span>
+
+        <span class="s1">textArea = </span><span class="s0">new </span><span class="s1">JTextArea()</span><span class="s0">;</span>
+        <span class="s1">textArea.setBackground(Color.BLACK)</span><span class="s0">;</span>
+        <span class="s1">textArea.setForeground(Color.WHITE)</span><span class="s0">;</span>
+        <span class="s1">textArea.setEditable(</span><span class="s0">false</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">textArea.setMargin(</span><span class="s0">new </span><span class="s1">Insets(</span><span class="s3">10</span><span class="s0">, </span><span class="s3">10</span><span class="s0">, </span><span class="s3">10</span><span class="s0">, </span><span class="s3">10</span><span class="s1">))</span><span class="s0">;</span>
+        <span class="s1">scrollPane = </span><span class="s0">new </span><span class="s1">JScrollPane(textArea)</span><span class="s0">;</span>
+        <span class="s0">this</span><span class="s1">.add(scrollPane)</span><span class="s0">;</span>
+        <span class="s1">connect()</span><span class="s0">;</span>
+    <span class="s1">}</span>
+    <span class="s0">void </span><span class="s1">connect() {</span>
+        <span class="s0">try</span><span class="s1">{</span>
+            <span class="s1">Socket socket = </span><span class="s0">new </span><span class="s1">Socket(serverIP</span><span class="s0">, </span><span class="s1">serverPort)</span><span class="s0">;</span>
+            <span class="s1">in = </span><span class="s0">new </span><span class="s1">InputStreamReader(socket.getInputStream())</span><span class="s0">;</span>
+            <span class="s1">out = </span><span class="s0">new </span><span class="s1">PrintWriter(socket.getOutputStream())</span><span class="s0">;</span>
+            <span class="s1">textArea.addKeyListener(</span><span class="s0">this</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">} </span><span class="s0">catch </span><span class="s1">(IOException e) {</span>
+            <span class="s1">textArea.setForeground(Color.RED)</span><span class="s0">;</span>
+            <span class="s1">textArea.append(</span><span class="s2">&quot;Server &quot; </span><span class="s1">+ serverIP + </span><span class="s2">&quot; port &quot; </span><span class="s1">+ serverPort + </span><span class="s2">&quot; &quot; </span><span class="s1">+ </span><span class="s2">&quot;&quot; </span><span class="s1">+ </span><span class="s2">&quot;NOT AVAILABLE&quot;</span><span class="s1">)</span><span class="s0">;</span>
+            <span class="s1">e.printStackTrace()</span><span class="s0">;</span>
+        <span class="s1">}</span>
+        <span class="s0">new </span><span class="s1">Thread() {</span>
+            <span class="s0">public void </span><span class="s1">run(){</span>
+            <span class="s0">while </span><span class="s1">(</span><span class="s0">true</span><span class="s1">) {</span>
+                <span class="s0">try </span><span class="s1">{</span>
+                    <span class="s1">addCharToTextArea((</span><span class="s0">char</span><span class="s1">) (in.read()))</span><span class="s0">;</span>
+                <span class="s1">} </span><span class="s0">catch </span><span class="s1">(IOException e) {</span>
+                    <span class="s1">textArea.setForeground(Color.RED)</span><span class="s0">;</span>
+                    <span class="s1">textArea.append(</span><span class="s2">&quot;</span><span class="s0">\n</span><span class="s2">CONNECTION ERROR&quot;</span><span class="s1">)</span><span class="s0">;</span>
+                    <span class="s1">e.printStackTrace()</span><span class="s0">;</span>
+                    <span class="s0">return;</span>
+                <span class="s1">}</span>
+            <span class="s1">}</span>
+            <span class="s1">}</span>
+        <span class="s1">}.start()</span><span class="s0">;</span>
+    <span class="s1">}</span>
+    <span class="s0">public static void </span><span class="s1">main(String[] args) {</span><span class="s0">new </span><span class="s1">NetClient().setVisible(</span><span class="s0">true</span><span class="s1">)</span><span class="s0">;</span><span class="s1">}</span>
+
+    <span class="s1">@Override</span>
+    <span class="s0">public void </span><span class="s1">keyPressed(KeyEvent arg0) {}</span>
+    <span class="s1">@Override</span>
+    <span class="s0">public void </span><span class="s1">keyReleased(KeyEvent arg0) {}</span>
+
+    <span class="s1">@Override</span>
+    <span class="s0">public void </span><span class="s1">keyTyped(KeyEvent arg0) {</span>
+        <span class="s1">out.print(arg0.getKeyChar())</span><span class="s0">;</span>
+        <span class="s1">out.flush()</span><span class="s0">;</span>
+
+        <span class="s1">System.out.println((</span><span class="s0">int</span><span class="s1">)(arg0.getKeyChar()))</span><span class="s0">;</span>
+        <span class="s1">addCharToTextArea(arg0.getKeyChar())</span><span class="s0">;</span>
+    <span class="s1">}</span>
+    <span class="s0">void </span><span class="s1">addCharToTextArea(</span><span class="s0">char </span><span class="s1">c) {</span>
+        <span class="s1">textArea.append(c + </span><span class="s2">&quot;&quot;</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">textArea.setCaretPosition(textArea.getDocument().getLength())</span><span class="s0">;</span>
+    <span class="s1">}</span>
+<span class="s1">}</span>
+</pre>
+</body>
+</html>
